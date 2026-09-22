@@ -1,0 +1,2 @@
+import assert from 'node:assert/strict'; import test from 'node:test'; import { parseDeckList } from '../../../src/domain/deck-import/parse-deck-list.js';
+test('recognizes section and inline Commander intent', () => { const result = parseDeckList('Commander\n1 Sol Ring\nDeck\n1 Arcane Signet [Commander{top}]'); assert.equal(result.entries[0].commanderDesignated, true); assert.equal(result.entries[1].commanderDesignated, true); });
