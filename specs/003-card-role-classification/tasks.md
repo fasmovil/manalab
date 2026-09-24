@@ -27,11 +27,12 @@ description: "Dependency-ordered implementation tasks for Card Functional Role C
 **⚠️ CRITICAL**: Complete this phase before user-story work.
 
 - [ ] T002 Add adapter contract tests for intrinsic-behavior persistence, per-face availability, legacy-catalog incompatibility, and current-source unavailable behavior in tests/contract/card-reference-provider/local-catalog.test.ts
-- [ ] T003 Extend provider-neutral card behavior types and define the narrow IntrinsicCard projection in src/domain/cards/card-characteristics.ts
-- [ ] T004 Carry intrinsic behavior through exact card resolution and resolved import content without exposing deck-context fields to IntrinsicCard in src/domain/cards/card-reference-provider.ts and src/domain/deck-import/import-result.ts
-- [ ] T005 Enforce the intrinsic-behavior catalog schema and reject pre-schema legacy catalogs rather than synthesizing unavailable behavior in src/adapters/card-reference/local-catalog-store.ts and src/adapters/card-reference/local-catalog-loader.ts
-- [ ] T006 Normalize provider-specific rules, keywords, faces, availability, and observable Magic facts into provider-neutral behavior without assigning ManaLab roles in src/adapters/card-reference/scryfall-bulk-catalog-updater.ts
-- [ ] T007 Extend deterministic local catalog fixtures with available, unavailable, multi-face, and legacy-schema behavior cases in tests/fixtures/structural-card-catalog.ts
+- [ ] T003 Define provider-neutral intrinsic-behavior types and the narrow IntrinsicCard domain type in src/domain/cards/card-characteristics.ts
+- [ ] T004 Carry intrinsic behavior through exact card resolution and resolved import content in src/domain/cards/card-reference-provider.ts and src/domain/deck-import/import-result.ts
+- [ ] T005 Implement the explicit ResolvedDeckContent-to-IntrinsicCard projection without widening the classifier input in src/domain/card-role-classification/intrinsic-card.ts
+- [ ] T006 Enforce the intrinsic-behavior catalog schema and reject pre-schema legacy catalogs rather than synthesizing unavailable behavior in src/adapters/card-reference/local-catalog-store.ts and src/adapters/card-reference/local-catalog-loader.ts
+- [ ] T007 Normalize provider-specific rules, keywords, faces, availability, and observable Magic facts into provider-neutral behavior without assigning ManaLab roles in src/adapters/card-reference/scryfall-bulk-catalog-updater.ts
+- [ ] T008 Extend deterministic local catalog fixtures with available, unavailable, multi-face, and legacy-schema behavior cases in tests/fixtures/structural-card-catalog.ts
 
 **Checkpoint**: The import/catalog boundary can provide a valid narrow `IntrinsicCard`, preserves genuine current-data gaps, rejects stale schemas, and does not expose provider DTOs or deck-context fields to the future classifier.
 
@@ -45,15 +46,14 @@ description: "Dependency-ordered implementation tasks for Card Functional Role C
 
 ### Tests for User Story 1
 
-- [ ] T008 [P] [US1] Add unit acceptance tests for direct Mana Acceleration, Card Draw, Card Selection, Temporary Card Access, Tutor, Spot Removal, and explicit unclassified outcomes in tests/unit/card-role-classification/basic-role-classification.test.ts
-- [ ] T009 [P] [US1] Add integration tests proving classification receives the narrow IntrinsicCard projection rather than ResolvedDeckContent deck fields in tests/integration/card-role-classification/intrinsic-card-boundary.test.ts
+- [ ] T009 [P] [US1] Add unit acceptance tests for direct Mana Acceleration, Card Draw, Card Selection, Temporary Card Access, Tutor, Spot Removal, and explicit unclassified outcomes in tests/unit/card-role-classification/basic-role-classification.test.ts
+- [ ] T010 [P] [US1] Add integration tests proving classification receives the narrow IntrinsicCard projection rather than ResolvedDeckContent deck fields in tests/integration/card-role-classification/intrinsic-card-boundary.test.ts
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Define FunctionalRole, role-conclusion, issue, and FunctionalRoleClassification domain result types with canonical taxonomy ordering in src/domain/card-role-classification/classify-card-functional-roles.ts
-- [ ] T011 [US1] Implement pure direct-role classification and explicit unclassified behavior over IntrinsicCard in src/domain/card-role-classification/classify-card-functional-roles.ts
-- [ ] T012 [US1] Export classifyCardFunctionalRoles and its public result/input types from src/index.ts
-- [ ] T013 [US1] Implement the explicit ResolvedDeckContent-to-IntrinsicCard projection without widening the classifier input in src/domain/card-role-classification/intrinsic-card.ts
+- [ ] T011 [US1] Define FunctionalRole, role-conclusion, issue, and FunctionalRoleClassification domain result types with canonical taxonomy ordering in src/domain/card-role-classification/classify-card-functional-roles.ts
+- [ ] T012 [US1] Implement pure direct-role classification and explicit unclassified behavior over IntrinsicCard in src/domain/card-role-classification/classify-card-functional-roles.ts
+- [ ] T013 [US1] Export classifyCardFunctionalRoles and its public result/input types from src/index.ts
 
 **Checkpoint**: A consumer can classify straightforward resolved cards through the public library API and receive only intrinsic, provider-neutral results.
 
@@ -116,26 +116,26 @@ description: "Dependency-ordered implementation tasks for Card Functional Role C
 ### Phase Dependencies
 
 - **Phase 1**: Starts immediately.
-- **Phase 2**: Depends on T001 and blocks all user stories.
-- **User Stories**: US1, US2, and US3 all require Phase 2. US2 and US3 may prepare their distinct tests after T010, but their policy extensions require the direct-classification base from T011.
+- **Phase 2**: Depends on T001 and blocks all user stories; T003–T005 establish the complete intrinsic-card boundary before US1 begins.
+- **User Stories**: US1, US2, and US3 all require Phase 2. US2 and US3 may prepare their distinct tests after T011, but their policy extensions require the direct-classification base from T012.
 - **Polish**: Requires the implemented desired user stories.
 
 ### User Story Dependencies
 
 ```text
-Phase 1 → Phase 2 → US1 core (T010–T011) → US2 and US3 → Polish
-                         └───────────────→ US1 integration completes MVP
+Phase 1 → Phase 2 (T002–T008) → US1 core (T011–T012) → US2 and US3 → Polish
+                                         └──────────────→ US1 integration completes MVP
 ```
 
-- **US1**: Requires T001–T007; has no dependency on US2 or US3.
-- **US2**: Requires T001–T007 and the direct-classification base from T010–T011; it does not require US1's integration test.
-- **US3**: Requires T001–T007 and the direct-classification base from T010–T011; it validates partial results independently of multi-role coverage.
+- **US1**: Requires T001–T008; has no dependency on US2 or US3.
+- **US2**: Requires T001–T008 and the direct-classification base from T011–T012; it does not require US1's integration test.
+- **US3**: Requires T001–T008 and the direct-classification base from T011–T012; it validates partial results independently of multi-role coverage.
 
 ### Parallel Opportunities
 
-- After the shared fixture builder exists, T002 and T007 can proceed alongside type design preparation, but catalog implementation T003–T006 remains ordered by its data-flow dependencies.
-- T008 and T009 can run in parallel. T014, T015, and T016 can run in parallel. T020 and T021 can run in parallel because each owns a distinct test file.
-- After T010, separate contributors can prepare US2 and US3 tests in parallel; after T011, coordinate changes to the shared classifier implementation file in T017, T018, T022, and T023 sequentially.
+- After the shared fixture builder exists, T002 and T008 can proceed alongside type design preparation, but behavior propagation, projection, catalog compatibility, and adapter normalization in T003–T007 remain ordered by their data-flow dependencies.
+- T009 and T010 can run in parallel. T014, T015, and T016 can run in parallel. T020 and T021 can run in parallel because each owns a distinct test file.
+- After T011, separate contributors can prepare US2 and US3 tests in parallel; after T012, coordinate changes to the shared classifier implementation file in T017, T018, T022, and T023 sequentially.
 
 ## Parallel Examples
 
