@@ -5,7 +5,10 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "npm run build && node --test dist/tests/**/*.test.js"
+    "test": "npm run build && node --test dist/tests/**/*.test.js",
+    "smoke:catalog": "npm run build && node dist/scripts/smoke-catalog.js",
+    "smoke:deck": "npm run build && node dist/scripts/smoke-deck-analysis.js",
+    "smoke": "npm run smoke:catalog && npm run smoke:deck"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
